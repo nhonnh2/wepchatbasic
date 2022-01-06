@@ -5,8 +5,11 @@ import {
   signInWithPopup,
   FacebookAuthProvider,
   GoogleAuthProvider,
+  getAdditionalUserInfo,
 } from "firebase/auth";
+
 import { auth, db } from "../../firebase/config";
+import { addDocument } from "../../firebase/service";
 const { Title } = Typography;
 const fbProvider = new FacebookAuthProvider();
 const ggProvider = new GoogleAuthProvider();
@@ -14,12 +17,23 @@ fbProvider.setCustomParameters({
   display: "popup",
 });
 export default function Login() {
-  const handleFbLogin = () => {
-    signInWithPopup(auth, fbProvider);
+  const handleLogin = async (provider) => {
+    const data = await signInWithPopup(auth, provider);
+    const additionalUserInfo = getAdditionalUserInfo(data);
+    console.log(additionalUserInfo);
+    const { displayName, email, photoURL, uid } = data.user;
+    console.log(additionalUserInfo);
+    if (additionalUserInfo?.isNewUser) {
+      addDocument("users", {
+        displayName,
+        email,
+        photoURL,
+        uid,
+        providerId: additionalUserInfo.providerId,
+      });
+    }
   };
-  const handleGgLogin = () => {
-    signInWithPopup(auth, ggProvider);
-  };
+
   return (
     <>
       <Row justify="center">
@@ -29,13 +43,17 @@ export default function Login() {
           </Title>
           <Button
             className="w-full mt-4 border-solid border-[1px] border-red-500"
-            onClick={handleGgLogin}
+            onClick={() => {
+              handleLogin(ggProvider);
+            }}
           >
             Đăng nhập bằng Google
           </Button>
           <Button
             className="w-full mt-4 border-solid border-[1px] border-blue-500"
-            onClick={handleFbLogin}
+            onClick={() => {
+              handleLogin(fbProvider);
+            }}
           >
             Đăng nhập bằng Facebook
           </Button>
