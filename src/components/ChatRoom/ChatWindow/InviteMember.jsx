@@ -23,7 +23,7 @@ function DebounceSelect({ fetchOption, debounceTimeout = 300, ...props }) {
     const loadOptions = (value) => {
       setOptions([]);
       setFetching(true);
-      fetchOption(value).then((newOptions) => {
+      fetchOption(value, props.curMembers).then((newOptions) => {
         console.log("new options", newOptions);
         setOptions(newOptions);
         setFetching(false);
@@ -50,8 +50,7 @@ function DebounceSelect({ fetchOption, debounceTimeout = 300, ...props }) {
     </Select>
   );
 }
-async function fetchuserList(search) {
-  console.log(search, "search");
+async function fetchuserList(search, curMembers) {
   return getDocs(
     query(
       collection(db, "users"),
@@ -60,15 +59,16 @@ async function fetchuserList(search) {
       limit(20)
     )
   ).then((snapshot) => {
-    console.log("snapshot", snapshot);
-    return snapshot.docs.map((doc) => {
-      console.log("doc data", doc.data());
-      return {
-        label: doc.data().displayName,
-        photoURL: doc.data().photoURL,
-        value: doc.data().uid,
-      };
-    });
+    return snapshot.docs
+      .map((doc) => {
+        console.log("doc data", doc.data());
+        return {
+          label: doc.data().displayName,
+          photoURL: doc.data().photoURL,
+          value: doc.data().uid,
+        };
+      })
+      .filter((opt) => !curMembers.includes(opt.value));
   });
 }
 export default function InviteMember() {
@@ -112,6 +112,7 @@ export default function InviteMember() {
             fetchOption={fetchuserList}
             onChange={(newValue) => setValue(newValue)}
             style={{ width: "100%" }}
+            curMembers={selectedRoom?.members}
           />
         </Form>
       </Modal>

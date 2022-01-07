@@ -24,7 +24,11 @@ export const useFirestore = (collectionName, condition) => {
 
             if (!value2 || value2.lenght <= 0) return;
 
-            collectionRef = query(collectionRef, where(value1, operator, value2));
+            collectionRef = query(
+                collectionRef,
+                where(value1, operator, value2),
+                orderBy("createAt")
+            );
         }
 
         const unregiter = onSnapshot(collectionRef, (snapshot) => {
