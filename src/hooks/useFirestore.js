@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase/config";
+
 import {
     collection,
     query,
@@ -22,15 +23,12 @@ export const useFirestore = (collectionName, condition) => {
             const { value1, operator, value2 } = condition;
 
             if (!value2 || value2.lenght <= 0) return;
-            console.log("condition useFirestore", condition);
 
             collectionRef = query(collectionRef, where(value1, operator, value2));
         }
-        console.log(" collectionRef useFirestore", collectionRef);
 
         const unregiter = onSnapshot(collectionRef, (snapshot) => {
             const data = snapshot.docs.map((doc) => ({...doc.data(), id: doc.id }));
-            console.log("data snaphot", data);
             setDocument(data);
         });
         return unregiter;

@@ -20,7 +20,8 @@ const PanelStyled = styled(Panel)`
   }
 `;
 export default function Roomlist() {
-  const { rooms, setIsAddRoomVisible } = useContext(AppContext);
+  const { rooms, setIsAddRoomVisible, setSelectedRoomId } =
+    useContext(AppContext);
   const handleAddRoom = () => {
     setIsAddRoomVisible(true);
   };
@@ -29,7 +30,14 @@ export default function Roomlist() {
       <PanelStyled header="Danh sách phòng chat" key="1">
         <div className="flex flex-col">
           {rooms?.map((room, idx) => (
-            <Typography.Link key={room.id}>{room.name}</Typography.Link>
+            <Typography.Link
+              key={room.id}
+              onClick={() => {
+                setSelectedRoomId(room.id);
+              }}
+            >
+              {room.name}
+            </Typography.Link>
           ))}
         </div>
         <Button

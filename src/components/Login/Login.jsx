@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 
 import { auth, db } from "../../firebase/config";
-import { addDocument } from "../../firebase/service";
+import { addDocument, generateKeywords } from "../../firebase/service";
 const { Title } = Typography;
 const fbProvider = new FacebookAuthProvider();
 const ggProvider = new GoogleAuthProvider();
@@ -30,6 +30,7 @@ export default function Login() {
         photoURL,
         uid,
         providerId: additionalUserInfo.providerId,
+        keyword: generateKeywords(displayName),
       });
     }
   };
